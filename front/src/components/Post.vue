@@ -19,7 +19,7 @@
       <q-icon name="fas fa-star" color="blue" size="15px" class="q-ml-sm"/>
       <q-icon name="fas fa-ellipsis-h" size="18px" class="q-ml-sm"></q-icon>
     </div>
-    <p class="col-12 q-mt-lg q-mx-sm" v-html="post.title"></p>
+    <p class="col-12 q-mt-lg q-mx-sm" v-html="post.text"></p>
     <q-img :src="post.url" :ratio="1"></q-img>
     <div class="row full-width items-center justify-between q-my-sm">
       <div class="row items-center">

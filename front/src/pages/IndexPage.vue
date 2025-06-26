@@ -4,12 +4,17 @@
       <q-avatar class="q-mr-sm">
         <img src="https://cdn.quasar.dev/img/avatar.png" alt="">
       </q-avatar>
-      <q-input rounded outlined v-model="text" label="No que você esta pensando?"
-      label-color="black"
+      <q-input
+        rounded
+        outlined
+        v-model="text"
+        @click="openDialog"
+        label="No que você esta pensando?"
+        label-color="black"
 
-      >
+      />
 
-      </q-input>
+
      </div>
      <div class="line q-mt-md" />
      <div class="row justify-around full-width q-pa-sm">
@@ -75,6 +80,77 @@
      </div>
      <div class="line-strong q-mt-md"></div>
      <Post v-for="item in posts" :key="item" :post="item"/>
+    <q-dialog
+      v-model="dialog"
+      full-height
+      full-width
+      maximized
+      position="bottom"
+    >
+      <q-card>
+        <div class="q-ma-md q-pa-sm row items-center justify-between full-width ">
+            <div>
+              <q-icon name="arrow_back" size="23px" class="q-mr-sm" @click="dialog = false"></q-icon>
+               <span> Criar publicação</span>
+            </div>
+                      <span
+                      class="q-mr-sm"
+                      @click="sendPost"
+                      :class=" image !== '' ? 'text-blue' : 'text-grey' "
+                      >
+                        PUBLICAR
+                      </span>
+            <div class="line q-mt-md"></div>
+         </div>
+        <div class="row q-ma-md" >
+            <q-avatar class="q-mr-sm" >
+              <img src="https://cdn.quasar.dev/img/avatar.png" alt="">
+            </q-avatar>
+            <div class="column">
+              <strong>Sidemar Schimmelpfennig</strong>
+              <div class="row">
+                <div class="custom-button row items-center  justify-around q-mr-sm">
+                  <q-icon name="fas fa-globe-asia" size="12px"></q-icon>
+                  <strong>Público</strong>
+                  <q-icon name="arrow_drop_down" size="25px"></q-icon>
+                </div>
+                <div class="custom-button row items-center  justify-around q-mr-sm">
+                  <q-icon name="add" size="12px"></q-icon>
+                  <strong>Album</strong>
+                  <q-icon name="arrow_drop_down" size="25px"></q-icon>
+                </div>
+              </div>
+
+            </div>
+        </div>
+        <q-input v-model="text"
+        filled
+        class="custom-text-area full-width"
+        label-color="grey-5"
+        rows="20"
+        :placeholder="image === '' ? 'No que você está pensando': 'Diga algo sobre essa foto'"
+        :type="image === '' ? 'textarea' : 'text' "
+        bg-color="white" >
+
+        </q-input>
+        <q-img v-if="image !== ''" :src="image" :ratio="1">
+
+        </q-img>
+        <q-card-section class="row items-center no-wrap">
+            <span>Adicionar a sua pulicação</span>
+            <q-space></q-space>
+            <div class="row justify-between items-center" style="width: 30%;">
+                <q-icon name="video_call" size="28px" color="purple" @click="openUpload()"></q-icon>
+                <q-icon name="far fa-images" size="20px" color="light-green-7" ></q-icon>
+                <q-icon name="person" size="20px" color="blue" ></q-icon>
+                <q-icon name="insert_emoticon" size="20px" color="orange-6"></q-icon>
+            </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+    <q-file v-model="file" id="fileUpload" v-show="false">
+
+    </q-file>
   </q-page>
 </template>
 
@@ -82,139 +158,76 @@
   import Post from "../components/Post.vue";
   export default{
     name:"PageIndex",
-    data() {
+    data(){
       return {
         text:"",
-        posts:[]
+        posts:[],
+        dialog:  false,
+        image:"",
+        file:[]
       }
     },
     components:{
       Post
     },
-    beforeMount() {
-      this.posts= [
-      {
-        id: 1,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "João Pedro",
-        time: "Ontem às 21:59",
-        title: "Irmãos <b>#familia</b>",
-        text: "Hoje o dia amanheceu assim churrasco, família e emoção.",
-        url: "https://picsum.photos/300/",
-        likes: 100,
-        comments: 6,
-        shared: 4,
+    methods: {
+      triggerNegative(){
+        this.$q.notify({
+          type:"negative",
+          position:"top",
+          message:`Você precisa enviar uma imagem`
+        })
       },
-      {
-        id: 2,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Maria Clara",
-        time: "Hoje às 08:15",
-        title: "Amigos <b>#diversão</b>",
-        text: "Café da manhã com os melhores amigos. Gratidão define!",
-        url: "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=600",
-        likes: 87,
-        comments: 10,
-        shared: 3,
-      },
-      {
-        id: 3,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Lucas Silva",
-        time: "Ontem às 19:00",
-        title: "Natureza <b>#aventura</b>",
-        text: "Trilha incrível hoje. Paz, natureza e superação.",
-        url: "https://placebear.com/300/300",
-        likes: 132,
-        comments: 15,
-        shared: 7,
-      },
-      {
-        id: 4,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Ana Beatriz",
-        time: "2 horas atrás",
-        title: "Foco <b>#trabalho</b>",
-        text: "Segunda-feira produtiva, foco nos projetos e nas metas.",
-        url: "https://placebear.com/300/300",
-        likes: 76,
-        comments: 5,
-        shared: 2,
-      },
-      {
-        id: 5,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Felipe Augusto",
-        time: "Hoje às 14:32",
-        title: "Sabores <b>#culinaria</b>",
-        text: "Almoço especial preparado com muito amor.",
-        url: "https://picsum.photos/99/300",
-        likes: 98,
-        comments: 8,
-        shared: 4,
-      },
-      {
-        id: 6,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Larissa Souza",
-        time: "Há 30 minutos",
-        title: "Paz <b>#relax</b>",
-        text: "Final de tarde perfeito pra recarregar as energias.",
-        url: "https://placebear.com/300/300",
-        likes: 156,
-        comments: 12,
-        shared: 5,
-      },
-      {
-        id: 7,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Gabriel Rocha",
-        time: "3 dias atrás",
-        title: "Velocidade <b>#carros</b>",
-        text: "Encontro de carros antigos, uma paixão que nunca envelhece.",
-        url: "https://picsum.photos/720/300",
-        likes: 205,
-        comments: 25,
-        shared: 9,
-      },
-      {
-        id: 8,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Isabela Lima",
-        time: "Ontem às 17:45",
-        title: "Pet <b>#amordepet</b>",
-        text: "Dia de banho, carinho e muitos petiscos para o meu doguinho.",
-        url: "https://picsum.photos/660/300",
-        likes: 182,
-        comments: 22,
-        shared: 6,
-      },
-      {
-        id: 9,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Ricardo Mendes",
-        time: "Hoje às 10:00",
-        title: "Fitness <b>#saúde</b>",
-        text: "Treino concluído, disciplina e foco total.",
-        url: "https://picsum.photos/500/300",
-        likes: 120,
-        comments: 9,
-        shared: 3,
-      },
-      {
-        id: 10,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
-        name: "Camila Ferreira",
-        time: "Há 5 minutos",
-        title: "Arte <b>#criatividade</b>",
-        text: "Finalizando um novo quadro cheio de cores e vida.",
-        url: "https://picsum.photos/600/300",
-        likes: 97,
-        comments: 7,
-        shared: 2,
-      },
-    ];
+      async sendPost () {
+          if(this.image === ""){
+             this.triggerNegative()
+             return
+          }
+          const body = {
+            text: this.text,
+            picture: this.image
+          }
 
+          await this.$api.post('post', body, {}).then((result) => {
+            this.dialog = false
+            this.text = ""
+            this.image = ""
+            this.posts=[result.data, ...this.posts ]
+          }).catch((err) => {
+            console.log(err)
+          });
+      },
+      openUpload(){
+        document.querySelector(".q-field__input").click()
+      },
+      openDialog(){
+        this.dialog = true
+      }
+    },
+    watch:{
+      async file(){
+        var formData = new FormData()
+        formData.append("image", this.file)
+        await this.$api.post("upload", formData,{
+          headers:{
+            "Content-Type": "multipart/form-data"
+          }
+        }).then((result) => {
+          console.log(result)
+          const response  = result.data
+          this.image = `http://localhost:3000/${response.image}`
+        }).catch((err) => {
+          console.log(err)
+        });
+      }
+    },
+     async beforeMount() {
+        await this.$api.get('post',{}).then((result) => {
+            console.log(result)
+            this.posts = result.data
+        }).catch((err) => {
+            console.error("Erro ao buscar posts:", err);
+        });
     },
   }
 //
@@ -269,4 +282,20 @@
         width: 50%;
       }
     }
+    .custom-button{
+      width: 90px;
+      height: 30px;
+      padding: 2px;
+      font-size: 12px;
+      border: 1px solid #e5e5e5 ;
+      border-radius: 7px;
+
+      cursor: pointer;
+         .q-icon, strong{
+      color: #969393;
+    }
+    }
+
+
+
 </style>
